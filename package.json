@@ -1,21 +1,39 @@
 {
-  "name": "connrct-ssi-online",
+  "name": "connect-include-online",
   "version": "1.0.0",
-  "description": "",
+  "description": "Middleware for connect",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+	  "async": "^2.0.0-rc.3",
+	  "defaults": "^1.0.3",
+	  "fs": "0.0.2",
+	  "iconv-lite": "^0.4.13",
+	  "parseurl": "^1.3.1",
+	  "path": "^0.12.7",
+	  "request": "^2.70.0",
+	  "request-progress": "^2.0.1"
+  },
   "devDependencies": {
-    "default": "^0.1.1",
-    "fs": "0.0.2",
-    "gulp": "^3.9.1",
-    "parseurl": "^1.3.1",
-    "path": "^0.12.7",
-    "request": "^2.70.0",
-    "request-progress": "^2.0.1"
+	"gulp-connect": "^3.2.2",
+	 "gulp": "^3.9.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "gogoluo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samanthaluo/connect-include-online.git"
+  },
+  "keywords": [
+    "gulpplugin",
+    "connect",
+    "include",
+    "online"
+  ],
+  "bugs": {
+    "url": "https://github.com/samanthaluo/connect-include-online/issues"
+  },
+  "homepage": "https://github.com/samanthaluo/connect-include-online",
+  "author": "samantha",
   "license": "ISC"
 }

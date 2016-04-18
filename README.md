@@ -42,7 +42,7 @@ ps:"domain"例如"http://sports.qq.com" 或 "sports.qq.com"
 ## Configuration
 
     {
-        exts: 'html|htm|shtm', //文件扩展名，以扩展名结束的正则表达式
+        exts: 'html|htm|shtm', //文件扩展名，对request的文件过滤
         baseDir: __dirname, // base path to look in for files
         encoding:'gbk' //当include的线上文件是gbk编码，需转换为"utf-8"时
     }

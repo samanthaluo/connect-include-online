@@ -20,7 +20,8 @@ connect-include-online
     <!--# include file="path" domain="domain" -->
     <!--# include virtual="path" domain="domain" -->
 
-ps:"domain"例如"http://sports.qq.com","path"例如"/a/b/c.html"
+ps:"domain" 例如"http://sports.qq.com"
+   "path" 例如"/a/b/c.html"
 
 下一步，作为插件使用：
 

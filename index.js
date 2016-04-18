@@ -33,20 +33,25 @@ function resolveIncludes(content, opt, callback){
                         }
                     );
 				}else{
-				var src=domain+shortPath;
-				progress(request({url:src,encoding:null},function(err,innerRes,innerContent){
-					if(err){
-						return innerNext(err);	
+					var httpReg=/(http|ftp|https):\/\//g;
+					httpReg.lastIndex=0;
+					if(!httpReg.test(domain)){
+						domain="http://"+domain
 					}
-
-					if(opt.encoding.toLowerCase()=='gbk'){
-						innerContent= iconv.decode(innerContent, 'GBK');//return unicode string from GBK encoded bytes
-					}
-					var first = matches.index;
-					var second=matches.index + matches[0].length;
-					content = content.slice(0,first)+innerContent+content.slice(second);
-					innerNext(null, content);
-				}),{throttle:1000,delay:1000});
+					var src=domain+shortPath;
+					progress(request({url:src,encoding:null},function(err,innerRes,innerContent){
+						if(err){
+							return innerNext(err);	
+						}
+	
+						if(opt.encoding.toLowerCase()=='gbk'){
+							innerContent= iconv.decode(innerContent, 'GBK');//return unicode string from GBK encoded bytes
+						}
+						var first = matches.index;
+						var second=matches.index + matches[0].length;
+						content = content.slice(0,first)+innerContent+content.slice(second);
+						innerNext(null, content);
+					}),{throttle:1000,delay:1000});
 				}
 			},
 			function includesComplete(err){
@@ -58,20 +63,22 @@ function resolveIncludes(content, opt, callback){
 		);	
 }
 
-function endsWith(str, suffix) {
-    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+function endsWith(str, suffixs) {
+    var extReg = new RegExp('[.]('+suffixs+')$','g');
+	return extReg.test(str);
 }
 
 module.exports = function(opt){
 	opt = defaults(opt, {
     	baseDir: '.',
-    	ext: '.html',
+    	exts: 'html',
     	encoding:''
   	});
 
   	return function(req,res,next){
   		var url = parseurl(req).pathname;
-		if(!endsWith(url, opt.ext)) {
+  		url = /\/$/.test(url) ? (url + 'index.html') : url;
+		if(!endsWith(url, opt.exts)) {
 	    	return next();
 	    }
 		var filePath = path.join(opt.baseDir, url);

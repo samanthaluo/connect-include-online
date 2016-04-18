@@ -20,8 +20,8 @@ connect-include-online
     <!--# include file="path" domain="domain" -->
     <!--# include virtual="path" domain="domain" -->
 
-ps:"domain" 例如"http://sports.qq.com"
-   "path" 例如"/a/b/c.html"
+ps:"domain"例如"http://sports.qq.com" 或 "sports.qq.com"
+   "path"例如"/a/b/c.html"
 
 下一步，作为插件使用：
 
@@ -32,7 +32,7 @@ ps:"domain" 例如"http://sports.qq.com"
         middleware: function() {
             return [connectIncludeOnline({
 	    		baseDir: '.',
-	            ext:'.html',
+	            exts:'html',
 	            encoding:'gbk'
 	    	})];
         }
@@ -42,7 +42,7 @@ ps:"domain" 例如"http://sports.qq.com"
 ## Configuration
 
     {
-        ext: '.html', // file extension. Only urls ending in this will be evaluated.
+        exts: 'html|htm|shtm', //文件扩展名，以扩展名结束的正则表达式
         baseDir: __dirname, // base path to look in for files
         encoding:'gbk' //当include的线上文件是gbk编码，需转换为"utf-8"时
     }

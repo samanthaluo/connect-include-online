@@ -89,7 +89,7 @@ module.exports = function(opt){
 			}
 			resolveIncludes(content, opt, function(err, content){
 				if(err){
-					return next();
+					return next(err);
 				}
 				res.end(content);
 			})

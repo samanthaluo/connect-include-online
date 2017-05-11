@@ -1,17 +1,20 @@
 var gulp = require('gulp');
 var connect=require('gulp-connect'); //本地服务
+
 //本地server
-gulp.task('dev:connect',function(){
+gulp.task('connect',function(){
 	connect.server({
-	    root: 'src',
+	    root: 'test',
 	    port:80,
 	    livereload: true,
 	    middleware: function() {
 	    	return [connectIncludeOnline({
-	    		baseDir: 'src',
-	            exts:'html|htm|shtm',
-	            encoding:'gbk'
-	    	})];   
+	    		baseDir:'test',
+	            exts:'html|htm',
+	            encoding:'gbk',
+				config:'./test'
+	    	})];
 	    }
 	  })
 });
+

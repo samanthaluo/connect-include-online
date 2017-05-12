@@ -89,9 +89,10 @@ module.exports = function(opt){
 				return next(err);
 			}
 			var configFile = opt.config? opt.config:'./config.json';
+			configFile = path.resolve(process.cwd(), configFile);
 			fs.access(configFile,function(err) {
 				if (!err) {
-					var ssi = require('./ssi.json');
+					var ssi = require(configFile);
 					var online = ssi.online;
 					var whichPath = 0;
 					var len = 0;

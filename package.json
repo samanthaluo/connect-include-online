@@ -1,6 +1,6 @@
 {
   "name": "connect-include-online",
-  "version": "2.1.4",
+  "version": "2.1.6",
   "description": "Middleware for connect",
   "main": "index.js",
   "dependencies": {

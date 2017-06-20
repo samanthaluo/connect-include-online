@@ -11,11 +11,14 @@ var defaults = require('defaults');
 
 var includeFileReg=/<!--#\s*include\s+(file|virtual)=(['"])([^\r\n]+?)\2\s*-->/g;
 var httpReg=/(http|ftp|https):\/\//g;
+var reqArr=[];
+var status=false;
+
 function resolveIncludes(content, opt,callback){
 	content = content.toString();
+	includeFileReg.lastIndex =0;
 	async.whilst(
 		function test() {
-			includeFileReg.lastIndex =0;
 			return !!(matches = includeFileReg.exec(content));
 		},
 		function insertInclude(innerNext){
@@ -25,16 +28,11 @@ function resolveIncludes(content, opt,callback){
 				if (err) { //读取本地文件出错
 					var domain = opt.domain;
 					if(opt.domain){
-						httpReg.lastIndex=0;
-						if(!httpReg.test(domain)){
-							domain="http://"+domain
-						}
 						var src=domain+shortPath;
-						progress(request({url:src,encoding:null},function(err1,innerRes,innerContent){
+						progress(request({url:src,encoding:null},function(err1,response,innerContent){
 							if(err1){
 								return innerNext(err+' and '+err1);
 							}
-
 							if(opt.encoding.toLowerCase()=='gbk'){
 								innerContent= iconv.decode(innerContent, 'GBK');//return unicode string from GBK encoded bytes
 							}
@@ -43,7 +41,6 @@ function resolveIncludes(content, opt,callback){
 								var second=matches.index + matches[0].length;
 								content = content.slice(0,first)+innerContent+content.slice(second);
 							}
-
 							innerNext(null, content);
 						}),{throttle:1000,delay:1000});
 					}
@@ -53,6 +50,7 @@ function resolveIncludes(content, opt,callback){
 					innerNext(null, content);
 				}
 			});
+
 		},
 		function includesComplete(err){
 			if(err){
@@ -70,19 +68,27 @@ function endsWith(str, suffixs) {
 
 module.exports = function(opt){
 	opt = defaults(opt, {
-    	baseDir: '.',
-    	exts: 'html',
-    	encoding:''
-  	});
-
+		baseDir: '.',
+		exts: 'html',
+		encoding:'',
+		config:false,
+		domain:''
+	});
 	return function(req,res,next){
 		var url = parseurl(req).pathname;
 		url = /\/$/.test(url) ? (url + 'index.html') : url;
 		if(!endsWith(url, opt.exts)) {
 			return next();
 		}
+		reqArr.push(url);
+		if(status){return;}
+		status = true;
+		var finalUrl = reqArr.pop();
+		if(!finalUrl){return;}
+		reqArr.length=0;
 
-		var filePath = path.join(opt.baseDir, url);
+		var domain =opt.domain;
+		var filePath = path.join(opt.baseDir, finalUrl)
 		//文件读取
 		fs.readFile(filePath,{},function(err,content){
 			if(err){ //读取当前文件出错，继续下一个文件
@@ -90,10 +96,10 @@ module.exports = function(opt){
 			}
 			var configFile = opt.config? opt.config:'./config.json';
 			configFile = path.resolve(process.cwd(), configFile);
-			fs.access(configFile,function(err) {
-				if (!err) {
-					var ssi = require(configFile);
-					var online = ssi.online;
+			if(fs.existsSync(configFile)){
+				var ssi = require(configFile);
+				var online = ssi.online;
+				if(online && online.length>0){
 					var whichPath = 0;
 					var len = 0;
 					online.forEach(function (item, i) {
@@ -109,15 +115,20 @@ module.exports = function(opt){
 					opt.domain = ssi.online[whichPath].domain;
 				}
 
-				resolveIncludes(content, opt,function(err, content){
-					if(err){
-						return next(err);
-					}
-					res.end(content);
-				})
-			});
-
+			}
+			httpReg.lastIndex =0;
+			if (!httpReg.test(domain)) {
+				opt.domain = "http://" + domain
+			}
+			resolveIncludes(content, opt,function(err, content){
+				if(err){
+					return next(err);
+				}
+				res.end(content);
+				status = false;
+			})
 		});
+
 	}
 
 }
